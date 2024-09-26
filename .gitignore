@@ -1,1 +1,4 @@
 cross-compiler/
+*.iso
+isodir
+sysroot
