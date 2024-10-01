@@ -4,7 +4,7 @@ PROJECTS="libc kernel"
 export MAKE=${MAKE:-make}
 export HOST=${HOST:-$(./default-host.sh)}
 
-export CROSS=$HOME/os/cross-compiler/bin/i686-elf
+export CROSS=$HOME/os/cross-compiler/i686/bin/i686-elf
 
 export AR=${CROSS}-ar
 export AS=${CROSS}-as
