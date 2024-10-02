@@ -1,7 +1,7 @@
 #include <kernel/gdt.h>
 
 // GDT Entry Macros (Definitions)
-#define GDT_ENTRY_NULL_DESCRIPTOR 0x00  // Null descriptor
+#define GDT_ENTRY_NULL_DESCRIPTOR 0  // Null descriptor
 
 // Kernel Mode Segments
 #define GDT_ENTRY_KERNEL_CODE 1       // Kernel Mode Code Segment
@@ -14,11 +14,26 @@
 // Task State Segment
 #define GDT_ENTRY_TSS 5               // Task State Segment
 
-// GDT Entry Macro
-#define GDT_ENTRY(base, limit, flags) \
-    (((limit) & 0xFFFF) | (((base) & 0xFFFF) << 16) | \
-    (((base) & 0xFF0000) << 16) | ((flags) << 40) | \
-    (((limit) & 0xF0000) << 32) | (((base) & 0xFF000000) << 32))
+// GDT Create Entry 
+uint64_t create_descriptor(uint32_t base, uint32_t limit, uint16_t flag)
+{
+    uint64_t descriptor;
+
+    // Create the high 32-bit segment
+    descriptor  =  (limit & 0x000F0000);         // Set limit bits 19:16
+    descriptor |= ((flag) << 8) & 0x00F0FF00;    // Set type, p, dpl, s, g, d/b, l, and avl fields
+    descriptor |= ((base) >> 16) & 0x000000FF;    // Set base bits 23:16
+    descriptor |= (base & 0xFF000000);            // Set base bits 31:24
+
+    // Shift by 32 to allow for the low part of the segment
+    descriptor <<= 32;
+
+    // Create the low 32-bit segment
+    descriptor |= (base << 16);                   // Set base bits 15:0
+    descriptor |= (limit & 0x0000FFFF);           // Set limit bits 15:0
+
+    return descriptor;                             // Return the created descriptor
+}
 
 // GDT pointer structure
 struct gdt_ptr {
@@ -26,32 +41,32 @@ struct gdt_ptr {
     uint32_t ptr;
 } __attribute__((packed));
 
+// Assembly functions to load gdt and reload the segment registers
+extern void _lgdt();
 
 void setup_gdt() {
     // Define the Global Descriptor Table (GDT) with a size of 64 bits.
     // The GDT entries are aligned to 16 bytes to satisfy architecture requirements.
-    static const uint64_t gdt[] __attribute__((aligned(16))) = {
-        // Null Descriptor: A required entry, typically unused.
-        [GDT_ENTRY_NULL_DESCRIPTOR] = 0,  
-        [GDT_ENTRY_KERNEL_CODE] = GDT_ENTRY(0, 0xFFFFF, (GDT_CODE_PL0)),  
-        [GDT_ENTRY_KERNEL_DATA] = GDT_ENTRY(0, 0xFFFFF, (GDT_DATA_PL0)),  
-        [GDT_ENTRY_USER_CODE] = GDT_ENTRY(0, 0xFFFFF, (GDT_CODE_PL3)),  
-        [GDT_ENTRY_USER_DATA] = GDT_ENTRY(0, 0xFFFFF, (GDT_DATA_PL3)),
-        // Task State Segment (TSS): 
-        // TODO: This entry is currently not implemented and is not required for the kernel.
-        [GDT_ENTRY_TSS] = 0,
-    };
+    static uint64_t _gdt[5] __attribute__((aligned(16)));
+    // Null Descriptor: A required entry.
+    _gdt[GDT_ENTRY_NULL_DESCRIPTOR] = 0,  
+    _gdt[GDT_ENTRY_KERNEL_CODE] = create_descriptor(0, 0x000FFFFF, (GDT_CODE_PL0)); 
+    _gdt[GDT_ENTRY_KERNEL_DATA] = create_descriptor(0, 0x000FFFFF, (GDT_DATA_PL0));  
+    _gdt[GDT_ENTRY_USER_CODE] = create_descriptor(0, 0x000FFFFF, (GDT_CODE_PL3));
+    _gdt[GDT_ENTRY_USER_DATA] = create_descriptor(0, 0x000FFFFF, (GDT_DATA_PL3));
+    // Task State Segment (TSS): 
+    // TODO: This entry is currently not implemented and is not required for the kernel.
 
     // Structure to hold the pointer to the GDT and its length.
-    static struct gdt_ptr gdt_ptr;
+    static struct gdt_ptr gdt;
 
     // Set the length of the GDT (size of gdt array minus 1 for the null descriptor).
-    gdt_ptr.len = sizeof(gdt) - 1; 
+    gdt.len = sizeof(_gdt) - 1; 
     
-    // Set the pointer to the GDT; adds the data segment value (DS) shifted left by 4 bits.
-    // This is done to account for the segmentation in protected mode.
-    gdt_ptr.ptr = (uint32_t)&gdt + (ds() << 4); 
+    // Set the pointer to the GDTa
+    gdt.ptr = (uint32_t)&_gdt;
 
-    // Load the GDT into the CPU using the lgdt instruction.
-    asm volatile("lgdtl %0" : : "m" (gdt_ptr));
+    // Load the GDT into the CPU using the lgdt instruction and reload the segment registers.
+    _lgdt(&gdt);
+
 }
