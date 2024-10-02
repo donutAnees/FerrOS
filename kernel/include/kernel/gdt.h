@@ -5,8 +5,6 @@
  
 #include <stdio.h>
 #include <stdint.h>
-
-#include "segmentation.h"
  
 #define SEG_DESCTYPE(x)  ((x) << 0x04) // Descriptor type (0 for system, 1 for code/data)
 #define SEG_PRES(x)      ((x) << 0x07) // Present
