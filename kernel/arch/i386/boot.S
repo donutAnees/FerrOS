@@ -87,7 +87,8 @@ _start:
 .section .text
 
 4:
-    # Paging is now fully set up, and we are running in the higher half.
+    # Paging is now fully set up, and we are running in the higher half. Paging cannot be enabled without being in protected mode, 
+	# therefore this implicitly ensures that the CPU is in protected mode.
 
     # Unmap the identity mapping (since we no longer need it once paging is active).
     movl $0, boot_page_directory + 0
