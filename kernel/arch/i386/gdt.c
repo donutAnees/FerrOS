@@ -15,7 +15,7 @@
 #define GDT_ENTRY_TSS 5               // Task State Segment
 
 // GDT Create Entry 
-uint64_t create_descriptor(uint32_t base, uint32_t limit, uint16_t flag)
+static uint64_t create_descriptor(uint32_t base, uint32_t limit, uint16_t flag)
 {
     uint64_t descriptor;
 
@@ -47,7 +47,7 @@ extern void _lgdt();
 void setup_gdt() {
     // Define the Global Descriptor Table (GDT) with a size of 64 bits.
     // The GDT entries are aligned to 16 bytes to satisfy architecture requirements.
-    static uint64_t _gdt[5] __attribute__((aligned(16)));
+    static uint64_t _gdt[6] __attribute__((aligned(16)));
     // Null Descriptor: A required entry.
     _gdt[GDT_ENTRY_NULL_DESCRIPTOR] = 0,  
     _gdt[GDT_ENTRY_KERNEL_CODE] = create_descriptor(0, 0x000FFFFF, (GDT_CODE_PL0)); 
@@ -55,7 +55,8 @@ void setup_gdt() {
     _gdt[GDT_ENTRY_USER_CODE] = create_descriptor(0, 0x000FFFFF, (GDT_CODE_PL3));
     _gdt[GDT_ENTRY_USER_DATA] = create_descriptor(0, 0x000FFFFF, (GDT_DATA_PL3));
     // Task State Segment (TSS): 
-    // TODO: This entry is currently not implemented and is not required for the kernel.
+    // TODO: This entry is currently not implemented and is not required for the kernel as of now.
+    _gdt[GDT_ENTRY_TSS] = create_descriptor(0, 0, 0);
 
     // Structure to hold the pointer to the GDT and its length.
     static struct gdt_ptr gdt;
