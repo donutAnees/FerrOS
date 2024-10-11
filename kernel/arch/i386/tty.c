@@ -1,6 +1,5 @@
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <string.h>
 
 #include <kernel/tty.h>
@@ -29,10 +28,6 @@ void terminal_initialize(void) {
 			terminal_buffer[index] = vga_entry(' ', terminal_color);
 		}
 	}
-}
-
-static void terminal_setcolor(uint8_t color) {
-	terminal_color = color;
 }
 
 static void terminal_putentryat(unsigned char c, uint8_t color, size_t x, size_t y) {

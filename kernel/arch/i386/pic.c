@@ -45,8 +45,8 @@ void PIC_remap(uint8_t offset1, uint8_t offset2)
 {
 	uint8_t a1, a2;
 	
-	a1 = inb(PIC_MASTER_DATA);                        // save masks
-	a2 = inb(PIC_SLAVE_DATA);
+	a1 = inb(PIC_MASTER_DATA); // Save the interrupt mask of the master PIC (IRQs 0-7)
+	a2 = inb(PIC_SLAVE_DATA);  // Save the interrupt mask of the slave PIC (IRQs 8-15)
 	
 	outb(PIC_MASTER_COMMAND, ICW1_INIT | ICW1_ICW4);  // starts the initialization sequence (in cascade mode)
 	io_wait();
