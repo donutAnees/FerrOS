@@ -33,6 +33,40 @@ static void size_to_string(size_t size, char* buffer) {
     }
 }
 
+// Function to convert an integer to string (for %d specifier)
+static void int_to_string(int num, char* buffer) {
+    char* ptr = buffer;
+    bool negative = false;
+
+    if (num == 0) {
+        *ptr++ = '0';
+        *ptr = '\0';
+        return;
+    }
+
+    if (num < 0) {
+        negative = true;
+        num = -num;
+    }
+
+    size_t temp = num;
+    while (temp > 0) {
+        temp /= 10;
+        ptr++;
+    }
+
+    *ptr = '\0'; // Null-terminate the string
+
+    while (num > 0) {
+        *--ptr = (num % 10) + '0';
+        num /= 10;
+    }
+
+    if (negative) {
+        *--ptr = '-'; // Add negative sign
+    }
+}
+
 // Custom printf function
 int printf(const char* restrict format, ...) {
     va_list parameters;
@@ -87,6 +121,21 @@ int printf(const char* restrict format, ...) {
                 return -1;
             written += len;
         } 
+        // Handle integer (%d)
+        else if (*format == 'd') {
+            format++;
+            int value = va_arg(parameters, int);
+            char buffer[12]; // Buffer to hold string representation of the integer
+            int_to_string(value, buffer); // Convert integer to string
+            size_t len = strlen(buffer);
+            if (maxrem < len) {
+                // TODO: Set errno to EOVERFLOW.
+                return -1;
+            }
+            if (!print(buffer, len))
+                return -1;
+            written += len;
+        }
         // Handle sizeof (new functionality)
         else if (*format == 'z') {  // Use %z for sizeof
             format++;
