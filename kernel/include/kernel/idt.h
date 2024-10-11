@@ -27,6 +27,9 @@ void setup_idt(void);
 // Function to set an IDT descriptor
 void idt_set_descriptor(uint8_t vector, void* isr, uint8_t flags);
 
+// Function to install an IRQ handler
+void idt_install_irq_handler(void* handler);
+
 #endif
 
 
