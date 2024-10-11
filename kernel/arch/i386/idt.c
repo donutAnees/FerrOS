@@ -1,12 +1,13 @@
 #include <kernel/idt.h>
 #include <stdbool.h>
 
-static bool vectors[IDT_MAX_DESCRIPTORS];
-
 extern void* isr_stub_table[];
 
 // IDT Structure
 __attribute__((aligned(0x10))) static idt_entry_t idt[IDT_MAX_DESCRIPTORS];
+
+// Tracks the current index of the IDT set
+static uint8_t idt_index = 0;
 
 idt_ptr_t idt_ptr;
 
@@ -22,13 +23,19 @@ void idt_set_descriptor(uint8_t vector, void* isr, uint8_t flags) {
     descriptor->reserved       = 0;
 }
 
+void idt_install_irq_handler(void* handler) {
+    idt_set_descriptor(idt_index, handler, 0x8E);
+    idt_index++;
+}
+
 void setup_idt() {
     idt_ptr.base = (uintptr_t)&idt[0];
     idt_ptr.limit = (uint16_t)sizeof(idt_entry_t) * IDT_MAX_DESCRIPTORS - 1;
 
     for (uint8_t vector = 0; vector < IDT_CPU_EXCEPTION_COUNT; vector++) {
+        // 0x8E is a flag that defines a present, 32-bit interrupt gate with kernel-level (DPL 0) access. 
         idt_set_descriptor(vector, isr_stub_table[vector], 0x8E);
-        vectors[vector] = true;
+        idt_index++;
     }
 
     __asm__ volatile ("lidt %0" : : "m"(idt_ptr)); // load the new IDT
