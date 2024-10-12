@@ -1,11 +1,13 @@
 .section .text
 .extern exception_handler   # Declare the external exception handler
+.extern keyboard_irq_handler
 
 # ----------------------------
 # Macro for ISRs with error codes
 # ----------------------------
 .macro isr_err_stub num
 isr_stub_\num:
+    push $\num
     call exception_handler   # Call the common exception handler
     iret                      # Return from the interrupt (use iretq for 64-bit)
 .endm
@@ -15,6 +17,7 @@ isr_stub_\num:
 # ----------------------------
 .macro isr_no_err_stub num
 isr_stub_\num:
+    push $\num
     call exception_handler   # Call the common exception handler
     iret                      # Return from the interrupt (use iretq for 64-bit)
 .endm
@@ -54,6 +57,20 @@ isr_no_err_stub 28          # ISR 28: Reserved
 isr_no_err_stub 29          # ISR 29: Reserved
 isr_err_stub    30          # ISR 30: Security Exception
 isr_no_err_stub 31          # ISR 31: Reserved
+
+# ----------------------------
+# Define Standard IRQ 
+# ----------------------------
+
+.globl keyboard_isr_wrapper      # Make the keyboard_isr_wrapper function globally accessible
+.align 4                         # Align to 4-byte boundary
+
+keyboard_isr_wrapper:
+    pusha                        # Save all general-purpose registers (EAX, ECX, EDX, EBX, ESP, EBP, ESI, EDI)
+    cld                          # Clear the direction flag for the C calling convention
+    call keyboard_irq_handler    # Call the C function to handle the keyboard interrupt
+    popa                         # Restore all general-purpose registers
+    iret                         # Return from the interrupt
 
 # ----------------------------
 # Define the ISR Stub Table

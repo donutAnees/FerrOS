@@ -37,7 +37,6 @@ void setup_idt() {
         idt_set_descriptor(vector, isr_stub_table[vector], 0x8E);
         idt_index++;
     }
-
     __asm__ volatile ("lidt %0" : : "m"(idt_ptr)); // load the new IDT
     __asm__ volatile ("sti"); // set the interrupt flag
 }
