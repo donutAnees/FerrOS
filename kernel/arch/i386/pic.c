@@ -66,8 +66,8 @@ void PIC_remap(uint8_t offset1, uint8_t offset2)
 	outb(PIC_SLAVE_DATA, ICW4_8086);
 	io_wait();
 	
-	outb(PIC_MASTER_DATA, a1);   // restore saved masks.
-	outb(PIC_SLAVE_DATA, a2);
+	outb(PIC_MASTER_DATA, 0xff);   // Mask all interrupts
+	outb(PIC_SLAVE_DATA, 0xff);
 }
 
 void PIC_sendEOI(uint8_t irq)
