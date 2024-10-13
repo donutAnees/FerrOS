@@ -4,12 +4,23 @@
 #include <stdio.h>
 #include <string.h>
 
+#if defined(__is_libk)
+#include <kernel/tty.h>
+#endif
+
 // Function to print the given data.
 static bool print(const char* data, size_t length) {
     const unsigned char* bytes = (const unsigned char*) data;
-    for (size_t i = 0; i < length; i++)
+    for (size_t i = 0; i < length; i++) {
+        #if defined(__is_libk)
+            if (bytes[i] == '\n') {
+                terminal_newline();
+                continue;
+            }
+        #endif
         if (putchar(bytes[i]) == EOF)
             return false;
+    }
     return true;
 }
 
