@@ -44,10 +44,16 @@ void keyboard_irq_handler() {
         // If the scan code is 0x80, it is a key release, where the msb is set to 1.
         // We need to remove this bit to get the actual scancode.
         if((scancode & 0x80) == 0) {
-            keyboard_buffer[keyboard_buf_position].code = scancode;
-            keyboard_buf_position = (keyboard_buf_position + 1) % MAX_KEYB_BUFFER_SIZE;
-            terminal_putchar(ps2_kbd_return_ascii(scancode_mapping[scancode]));
+            if (scancode == 0x0E) { // Backspace
+                terminal_rmchar();
+                if(keyboard_buf_position != -1) keyboard_buf_position = (keyboard_buf_position - 1) % MAX_KEYB_BUFFER_SIZE;
+            } else {
+                keyboard_buffer[keyboard_buf_position].code = scancode;
+                keyboard_buf_position = (keyboard_buf_position + 1) % MAX_KEYB_BUFFER_SIZE;
+                terminal_putchar(ps2_kbd_return_ascii(scancode_mapping[scancode]));
+            }
         }
+       
     }
     PIC_sendEOI(1);
 }
