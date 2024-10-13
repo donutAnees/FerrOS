@@ -30,4 +30,14 @@ void terminal_write(const char* data, size_t size);
  */
 void terminal_writestring(const char* data);
 
+/**
+ * @brief Move the cursor to the next line.
+ */
+void terminal_newline();
+
+/*
+*@brief Remove the last character from the terminal
+*/
+void terminal_rmchar();
+
 #endif
