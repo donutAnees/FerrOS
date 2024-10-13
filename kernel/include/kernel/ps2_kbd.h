@@ -20,7 +20,6 @@
 #define CONTROL_FLAG (1 << 0)
 #define SHIFT_FLAG (1 << 1)
 #define ALT_FLAG (1 << 2)
-#define ENTER_FLAG (1 << 3)
 
 #define SET_MODIFIER(modifiers, flag) ((modifiers) |= (flag))
 #define CLEAR_MODIFIER(modifiers, flag) ((modifiers) &= ~(flag))

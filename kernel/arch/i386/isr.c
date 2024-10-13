@@ -32,8 +32,6 @@ void keyboard_irq_handler() {
             keyboard_buffer[keyboard_buf_position].status_mask |= SHIFT_FLAG;
         } else if (scancode == 0x38) { // Alt
             keyboard_buffer[keyboard_buf_position].status_mask |= ALT_FLAG;
-        } else if (scancode == 0x1C) { // Enter
-            keyboard_buffer[keyboard_buf_position].status_mask |= ENTER_FLAG;
         } else {
             // Do nothing for other keys for now
         }
@@ -47,7 +45,12 @@ void keyboard_irq_handler() {
             if (scancode == 0x0E) { // Backspace
                 terminal_rmchar();
                 if(keyboard_buf_position != -1) keyboard_buf_position = (keyboard_buf_position - 1) % MAX_KEYB_BUFFER_SIZE;
-            } else {
+            } 
+            else if (scancode == 0x1C) { // Enter
+                terminal_newline();
+                keyboard_buf_position = 0;
+            }
+            else {
                 keyboard_buffer[keyboard_buf_position].code = scancode;
                 keyboard_buf_position = (keyboard_buf_position + 1) % MAX_KEYB_BUFFER_SIZE;
                 terminal_putchar(ps2_kbd_return_ascii(scancode_mapping[scancode]));
