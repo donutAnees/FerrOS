@@ -1,7 +1,7 @@
-#FerrOS
+# FerrOS
 A 32 bit X86 Operating System Built from Scratch
 
-##Implemented Till Now
+## Implemented Till Now
 - [x] Booting
 - [x] TTY
 - [x] GDT
