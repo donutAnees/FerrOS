@@ -12,6 +12,8 @@ void kernel_main(void) {
 	setup_idt();
 	PIC_remap(0x20, 0x28);
 	ps2_kbd_init();
+	printf("Welcome to FerrOS\n");
+	printf("You can type here for now, more features to be added!\n");
 	while(true){
 	}
 }
