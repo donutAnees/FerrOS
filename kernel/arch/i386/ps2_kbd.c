@@ -35,56 +35,56 @@ void ps2_kbd_init() {
     idt_install_irq_handler(keyboard_isr_wrapper);
 }
 
-char ps2_kbd_return_ascii(kernel_scancode_set1_t scancode){
+char ps2_kbd_return_ascii(kernel_scancode_set1_t scancode, uint8_t* status_mask) {
     switch (scancode) {
-        case A: return 'a';
-        case B: return 'b';
-        case C: return 'c';
-        case D: return 'd';
-        case E: return 'e';
-        case F: return 'f';
-        case G: return 'g';
-        case H: return 'h';
-        case I: return 'i';
-        case J: return 'j';
-        case K: return 'k';
-        case L: return 'l';
-        case M: return 'm';
-        case N: return 'n';
-        case O: return 'o';
-        case P: return 'p';
-        case Q: return 'q';
-        case R: return 'r';
-        case S: return 's';
-        case T: return 't';
-        case U: return 'u';
-        case V: return 'v';
-        case W: return 'w';
-        case X: return 'x';
-        case Y: return 'y';
-        case Z: return 'z';
-        case ONE: return '1';
-        case TWO: return '2';
-        case THREE: return '3';
-        case FOUR: return '4';
-        case FIVE: return '5';
-        case SIX: return '6';
-        case SEVEN: return '7';
-        case EIGHT: return '8';
-        case NINE: return '9';
-        case ZERO: return '0';
-        case MINUS: return '-';
-        case EQUAL: return '=';
+        case A: return (*status_mask & SHIFT_FLAG) ? 'A' : 'a';
+        case B: return (*status_mask & SHIFT_FLAG) ? 'B' : 'b';
+        case C: return (*status_mask & SHIFT_FLAG) ? 'C' : 'c';
+        case D: return (*status_mask & SHIFT_FLAG) ? 'D' : 'd';
+        case E: return (*status_mask & SHIFT_FLAG) ? 'E' : 'e';
+        case F: return (*status_mask & SHIFT_FLAG) ? 'F' : 'f';
+        case G: return (*status_mask & SHIFT_FLAG) ? 'G' : 'g';
+        case H: return (*status_mask & SHIFT_FLAG) ? 'H' : 'h';
+        case I: return (*status_mask & SHIFT_FLAG) ? 'I' : 'i';
+        case J: return (*status_mask & SHIFT_FLAG) ? 'J' : 'j';
+        case K: return (*status_mask & SHIFT_FLAG) ? 'K' : 'k';
+        case L: return (*status_mask & SHIFT_FLAG) ? 'L' : 'l';
+        case M: return (*status_mask & SHIFT_FLAG) ? 'M' : 'm';
+        case N: return (*status_mask & SHIFT_FLAG) ? 'N' : 'n';
+        case O: return (*status_mask & SHIFT_FLAG) ? 'O' : 'o';
+        case P: return (*status_mask & SHIFT_FLAG) ? 'P' : 'p';
+        case Q: return (*status_mask & SHIFT_FLAG) ? 'Q' : 'q';
+        case R: return (*status_mask & SHIFT_FLAG) ? 'R' : 'r';
+        case S: return (*status_mask & SHIFT_FLAG) ? 'S' : 's';
+        case T: return (*status_mask & SHIFT_FLAG) ? 'T' : 't';
+        case U: return (*status_mask & SHIFT_FLAG) ? 'U' : 'u';
+        case V: return (*status_mask & SHIFT_FLAG) ? 'V' : 'v';
+        case W: return (*status_mask & SHIFT_FLAG) ? 'W' : 'w';
+        case X: return (*status_mask & SHIFT_FLAG) ? 'X' : 'x';
+        case Y: return (*status_mask & SHIFT_FLAG) ? 'Y' : 'y';
+        case Z: return (*status_mask & SHIFT_FLAG) ? 'Z' : 'z';
+        case ONE: return (*status_mask & SHIFT_FLAG) ? '!' : '1';
+        case TWO: return (*status_mask & SHIFT_FLAG) ? '@' : '2';
+        case THREE: return (*status_mask & SHIFT_FLAG) ? '#' : '3';
+        case FOUR: return (*status_mask & SHIFT_FLAG) ? '$' : '4';
+        case FIVE: return (*status_mask & SHIFT_FLAG) ? '%' : '5';
+        case SIX: return (*status_mask & SHIFT_FLAG) ? '^' : '6';
+        case SEVEN: return (*status_mask & SHIFT_FLAG) ? '&' : '7';
+        case EIGHT: return (*status_mask & SHIFT_FLAG) ? '*' : '8';
+        case NINE: return (*status_mask & SHIFT_FLAG) ? '(' : '9';
+        case ZERO: return (*status_mask & SHIFT_FLAG) ? ')' : '0';
+        case MINUS: return (*status_mask & SHIFT_FLAG) ? '_' : '-';
+        case EQUAL: return (*status_mask & SHIFT_FLAG) ? '+' : '=';
         case BACKSPACE: return '\b'; // Backspace character
         case TAB: return '\t'; // Tab character
-        case LEFT_BRACE: return '[';
-        case RIGHT_BRACE: return ']';
-        case SEMICOLON: return ';';
-        case APOSTROPHE: return '\'';
-        case BACKSLASH: return '\\';
-        case COMMA: return ',';
-        case PERIOD: return '.';
-        case SLASH: return '/';
+        case LEFT_BRACE: return (*status_mask & SHIFT_FLAG) ? '{' : '[';
+        case RIGHT_BRACE: return (*status_mask & SHIFT_FLAG) ? '}' : ']';
+        case SEMICOLON: return (*status_mask & SHIFT_FLAG) ? ':' : ';';
+        case APOSTROPHE: return (*status_mask & SHIFT_FLAG) ? '"' : '\'';
+        case BACKSLASH: return (*status_mask & SHIFT_FLAG) ? '|' : '\\';
+        case COMMA: return (*status_mask & SHIFT_FLAG) ? '<' : ',';
+        case PERIOD: return (*status_mask & SHIFT_FLAG) ? '>' : '.';
+        case SLASH: return (*status_mask & SHIFT_FLAG) ? '?' : '/';
         case SPACE: return ' ';
         default: return '\0'; // Non-printable characters
     }

@@ -233,6 +233,6 @@ void ps2_kbd_set_mask(bool mask);\
 /*
 *@brief Print the scancode of the PS/2 keyboard in ascii
 */
-char ps2_kbd_return_ascii(kernel_scancode_set1_t scancode);
+char ps2_kbd_return_ascii(kernel_scancode_set1_t scancode, uint8_t* status_mask);
 
 #endif
