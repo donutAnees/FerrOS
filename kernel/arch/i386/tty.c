@@ -17,17 +17,21 @@ static size_t terminal_column;
 static uint8_t terminal_color;
 static uint16_t* terminal_buffer;
 
-void terminal_initialize(void) {
-	terminal_row = 0;
-	terminal_column = 0;
-	terminal_color = vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_MAGENTA);
-	terminal_buffer = VGA_MEMORY;
+static void inline fill_screen(){
 	for (size_t y = 0; y < VGA_HEIGHT; y++) {
 		for (size_t x = 0; x < VGA_WIDTH; x++) {
 			const size_t index = y * VGA_WIDTH + x;
 			terminal_buffer[index] = vga_entry(' ', terminal_color);
 		}
 	}
+}
+
+void terminal_initialize(void) {
+	terminal_row = 0;
+	terminal_column = 0;
+	terminal_color = vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_MAGENTA);
+	terminal_buffer = VGA_MEMORY;
+	fill_screen();
 }
 
 static void terminal_putentryat(unsigned char c, uint8_t color, size_t x, size_t y) {
@@ -46,16 +50,14 @@ void terminal_putchar(char c) {
 }
 
 void terminal_newline(){
-	terminal_column = 0;
+	// Initialized to one for '>' prompt
+	terminal_column = 1;
+	// If we reach the end, we reset the screen
 	if(++terminal_row == VGA_HEIGHT) {
 		terminal_row = 0;
-		for (size_t y = 0; y < VGA_HEIGHT; y++) {
-			for (size_t x = 0; x < VGA_WIDTH; x++) {
-				const size_t index = y * VGA_WIDTH + x;
-				terminal_buffer[index] = vga_entry(' ', terminal_color);
-			}
-		}
-	}		
+		fill_screen();
+	}
+	terminal_putentryat('>', terminal_color, 0, terminal_row);
 }
 
 void terminal_rmchar(){
