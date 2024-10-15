@@ -1,16 +1,10 @@
 #include <stdbool.h>
-#include <stddef.h>
 #include <string.h>
 
 #include <kernel/tty.h>
+#include <kernel/cursor.h>
 
 #include "vga.h"
-
-static const size_t VGA_WIDTH = 80;
-static const size_t VGA_HEIGHT = 25;
-
-// Pointer to the VGA text buffer
-static uint16_t* const VGA_MEMORY = (uint16_t*) 0xC03FF000;
 
 static size_t terminal_row;
 static size_t terminal_column;
@@ -27,6 +21,7 @@ static void inline fill_screen(){
 }
 
 void terminal_initialize(void) {
+	enable_cursor(14, 15);
 	terminal_row = 0;
 	terminal_column = 0;
 	terminal_color = vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_MAGENTA);
@@ -34,14 +29,18 @@ void terminal_initialize(void) {
 	fill_screen();
 }
 
-static void terminal_putentryat(unsigned char c, uint8_t color, size_t x, size_t y) {
+static void terminal_putentryat(unsigned char c, uint8_t color, size_t x, size_t y, bool flag) {
 	const size_t index = y * VGA_WIDTH + x;
 	terminal_buffer[index] = vga_entry(c, color);
+	if(flag) 
+		update_cursor(index + 1);
+	else 
+		update_cursor(index);
 }
 
 void terminal_putchar(char c) {
 	unsigned char uc = c;
-	terminal_putentryat(uc, terminal_color, terminal_column, terminal_row);
+	terminal_putentryat(uc, terminal_color, terminal_column, terminal_row, true);
 	if (++terminal_column == VGA_WIDTH) {
 		terminal_column = 0;
 		if (++terminal_row == VGA_HEIGHT)
@@ -57,7 +56,7 @@ void terminal_newline(){
 		terminal_row = 0;
 		fill_screen();
 	}
-	terminal_putentryat('>', terminal_color, 0, terminal_row);
+	terminal_putentryat('>', terminal_color, 0, terminal_row, false);
 }
 
 void terminal_rmchar(){
@@ -69,7 +68,7 @@ void terminal_rmchar(){
 	} else {
 		terminal_column--;
 	}
-	terminal_putentryat(' ', terminal_color, terminal_column, terminal_row);
+	terminal_putentryat(' ', terminal_color, terminal_column, terminal_row, false);
 }
 
 void terminal_write(const char* data, size_t size) {

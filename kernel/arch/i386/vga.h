@@ -2,6 +2,7 @@
 #define ARCH_I386_VGA_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 /**
  * @file vga.h
@@ -12,6 +13,12 @@
  * The Lower 8 bits represent the ASCII character and the Upper 8 bit represents the color.
  * |COLOR|ASCII|
  */
+
+static const size_t VGA_WIDTH = 80;
+static const size_t VGA_HEIGHT = 25;
+
+// Pointer to the VGA text buffer
+static uint16_t* const VGA_MEMORY = (uint16_t*) 0xC03FF000;
 
 enum vga_color {
 	VGA_COLOR_BLACK = 0,
