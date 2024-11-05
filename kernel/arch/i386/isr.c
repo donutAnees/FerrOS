@@ -1,5 +1,6 @@
 #include <kernel/isr.h>
 #include <kernel/pic.h>
+#include <kernel/pit.h>
 #include <kernel/ps2_kbd.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -80,4 +81,9 @@ void keyboard_irq_handler() {
        
     }
     PIC_sendEOI(1);
+}
+
+void pit_irq_handler() {
+    pit_increment_tick();
+    PIC_sendEOI(0);
 }

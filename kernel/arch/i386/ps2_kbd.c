@@ -32,7 +32,6 @@ void ps2_kbd_init() {
     }
     IRQ_clear_mask(PS2_KBD_IRQ_LINE);
     idt_install_irq_handler(keyboard_isr_wrapper);
-    idt_install_irq_handler(keyboard_isr_wrapper);
 }
 
 char ps2_kbd_return_ascii(kernel_scancode_set1_t scancode, uint8_t* status_mask) {

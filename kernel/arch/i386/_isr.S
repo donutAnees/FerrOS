@@ -1,6 +1,7 @@
 .section .text
 .extern exception_handler   # Declare the external exception handler
 .extern keyboard_irq_handler
+.extern pit_irq_handler
 
 # ----------------------------
 # Macro for ISRs with error codes
@@ -62,7 +63,7 @@ isr_no_err_stub 31          # ISR 31: Reserved
 # Define Standard IRQ 
 # ----------------------------
 
-.globl keyboard_isr_wrapper      # Make the keyboard_isr_wrapper function globally accessible
+.global keyboard_isr_wrapper      # Make the keyboard_isr_wrapper function globally accessible
 .align 4                         # Align to 4-byte boundary
 
 keyboard_isr_wrapper:
@@ -71,6 +72,15 @@ keyboard_isr_wrapper:
     call keyboard_irq_handler    # Call the C function to handle the keyboard interrupt
     popa                         # Restore all general-purpose registers
     iret                         # Return from the interrupt
+
+.global pit_isr_wrapper
+
+pit_isr_wrapper:
+    pusha
+    cld
+    call pit_irq_handler
+    popa
+    iret
 
 # ----------------------------
 # Define the ISR Stub Table
