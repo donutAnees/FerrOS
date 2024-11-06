@@ -25,6 +25,12 @@ static volatile uint32_t system_timer_fraction;
 static volatile uint32_t system_timer_ms;
 
 /*
+ * The countdown is initialized to some value and decremented
+ * whenever a timer interrupt is received, this is used in sleep
+ */
+static volatile uint32_t countdown;
+
+/*
  * The IRQ0_ms and IRQ0_fraction denote the ms and fraction
  * current frequency of the PIT
  */
@@ -60,5 +66,11 @@ uint32_t pit_get_tick_count();
  *@brief Set the current tick count
  */
 void pit_set_tick_count(uint32_t tick_count);
+
+/*
+ *@brief Sleep for a certain amount of time
+ *@param ms The time to sleep in milliseconds
+ */
+void pit_sleep(uint32_t ms);
 
 #endif

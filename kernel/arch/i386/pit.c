@@ -69,5 +69,25 @@ void pit_increment_tick() {
         system_timer_ms += IRQ0_ms;
     }
     system_timer_fraction = new_fraction;
+    // Decrement the countdown if it is greater than 0
+    // used by sleep
+    if(countdown > 0) {
+        countdown--;
+    }
+}
+
+uint32_t pit_get_tick_count() {
+    return system_timer_ms;
+}
+
+void pit_set_tick_count(uint32_t tick_count) {
+    system_timer_ms = tick_count;
+}
+
+void pit_sleep(uint32_t ms) {
+    countdown = ms;
+    while(countdown > 0) {
+        __asm__ volatile("hlt");
+    }
 }
 
